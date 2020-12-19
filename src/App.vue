@@ -1,32 +1,115 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
-</template>
+  <!-- Contenedor principal -------------------------------------------->
+  <v-app id="inspire">
+    <v-system-bar app>
+      <v-spacer></v-spacer>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+      <v-icon>mdi-square</v-icon>
 
-#nav {
-  padding: 30px;
-}
+      <v-icon>mdi-circle</v-icon>
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+      <v-icon>mdi-triangle</v-icon>
+    </v-system-bar>
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+    <v-app-bar app>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+      <v-toolbar-title>Group 37</v-toolbar-title>
+    </v-app-bar>
+
+    <!-- Menú desplegable del lato izquierdo -->
+    <v-navigation-drawer v-model="drawer" fixed temporary>
+      <v-card class="mx-auto" width="300">
+        <v-list>
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-home</v-icon>
+            </v-list-item-icon>
+
+            <v-list-item-title>Home</v-list-item-title>
+          </v-list-item>
+
+          <v-list-group :value="true" prepend-icon="mdi-account-circle">
+            <template v-slot:activator>
+              <v-list-item-title>Users</v-list-item-title>
+            </template>
+
+            <v-list-group :value="true" no-action sub-group>
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title>Admin</v-list-item-title>
+                </v-list-item-content>
+              </template>
+
+              <v-list-item v-for="([title, icon], i) in admins" :key="i" link>
+                <v-list-item-title v-text="title"></v-list-item-title>
+
+                <v-list-item-icon>
+                  <v-icon v-text="icon"></v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list-group>
+
+            <v-list-group no-action sub-group>
+              <template v-slot:activator>
+                <v-list-item-content>
+                  <v-list-item-title>Actions</v-list-item-title>
+                </v-list-item-content>
+              </template>
+
+              <v-list-item v-for="([title, icon], i) in cruds" :key="i" link>
+                <v-list-item-title v-text="title"></v-list-item-title>
+
+                <v-list-item-icon>
+                  <v-icon v-text="icon"></v-icon>
+                </v-list-item-icon>
+              </v-list-item>
+            </v-list-group>
+          </v-list-group>
+        </v-list>
+      </v-card>
+    </v-navigation-drawer>
+    <!-- Aquí termina el menú desplegable del lado izquierdo -->
+
+    <v-main class="grey lighten-2">
+      <v-container>
+        <router-view></router-view>  
+      </v-container>
+    </v-main>
+  </v-app>
+</template> <!-- Contenedor principal -------------------------------------------->
+
+
+
+
+<script>
+import HelloWorld from "./components/HelloWorld";
+
+export default {
+  name: "App",
+
+  components: {
+    HelloWorld,
+  },
+
+  data: () => ({
+
+    //Script del wireframe 
+    drawer: null,
+
+    // Scripts de las listas desplegables 
+    admins: [
+        ['Management', 'mdi-account-multiple-outline'],
+        ['Settings', 'mdi-cog-outline'],
+      ],
+    cruds: [
+        ['Create', 'mdi-plus-outline'],
+        ['Read', 'mdi-file-outline'],
+        ['Update', 'mdi-update'],
+        ['Delete', 'mdi-delete'],
+      ],
+    //Aqui terminan los Scripts de las listas desplegables 
+
+  }),
+};
+</script>
