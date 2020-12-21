@@ -4,7 +4,7 @@
     <v-data-table 
     :headers="headers" 
     :items="articulos" 
-    sort-by="nombre" 
+    sort-by="id" 
     class="elevation-1"
     :loading="cargando"
     loading-text="Cargando... Espere por favor"
@@ -85,21 +85,21 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">
-                  Cancel
+                  Cancelar
                 </v-btn>
                 <v-btn color="blue darken-1" text @click="save">
-                  Save
+                  Guardar
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" max-width="600px">
             <v-card>
-              <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+              <v-card-title class="headline">Está seguro de cambiar el estado de este artículo?</v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                <v-btn color="blue darken-1" text @click="closeDelete">Cancelar</v-btn>
+                <v-btn color="blue darken-1" text @click="changeState">OK</v-btn>
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
@@ -149,7 +149,7 @@ export default {
     data: () => ({
     dialog: false,
     dialogDelete: false,
-    cargando: false, //al conectar a la base de datos este quedara true
+    cargando: true, //al conectar a la base de datos este quedara true
     headers: [
       { text: 'ID', value: 'id' },
       {
@@ -167,89 +167,8 @@ export default {
     desserts: [],
 
 // Creo este objeto que equivale a lo que me devolveria la peticion al backend para hacer pruebas
-    articulos: [
-      {
-        "id": 1,
-        "codigo": "12",
-        "nombre": "articulo 1",
-        "descripcion": "soy un articulo 1",
-        "estado": 1,
-        "categoriaId": 1,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951",
-        "categoria": {
-          "id": 1,
-          "nombre": "categoria 1",
-          "descripcion": "Soy una categoria numero 1",
-          "estado": 1,
-          "createdAt": "30/01/1891",
-          "updateAt": "05/02/1851"
-        }
-      },
-       {
-        "id": 2,
-        "codigo": "13",
-        "nombre": "articulo 2",
-        "descripcion": "soy un articulo 2",
-        "estado": 1,
-        "categoriaId": 2,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951",
-        "categoria": {
-          "id": 1,
-          "nombre": "categoria 1",
-          "descripcion": "Soy una categoria numero 1",
-          "estado": 1,
-          "createdAt": "30/01/1891",
-          "updateAt": "05/02/1851"
-          }
-        },
-        {
-        "id": 3,
-        "codigo": "14",
-        "nombre": "articulo 3",
-        "descripcion": "soy un articulo 3",
-        "estado": 0,
-        "categoriaId": 3,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951",
-        "categoria": {
-          "id": 2,
-          "nombre": "categoria 2",
-          "descripcion": "Soy una categoria numero 2",
-          "estado": 1,
-          "createdAt": "30/01/1891",
-          "updateAt": "05/02/1851"
-          }
-        },
-    ],
-    categorias: [
-      {
-        "id": 1,
-        "nombre": "categoria 1",
-        "descripcion": "soy una categoria 1",
-        "estado": 1,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951"
-      },
-      {
-        "id": 2,
-        "nombre": "categoria 2",
-        "descripcion": "soy una categoria 2",
-        "estado": 1,
-        "createdAt": "31/01/1991",
-        "updateAt": "06/02/1951"
-      },
-      {
-        "id": 3,
-        "nombre": "categoria 3",
-        "descripcion": "soy una categoria 3",
-        "estado": 0,
-        "createdAt": "31/02/1991",
-        "updateAt": "06/03/1951"
-      }
-    ],
-
+    articulos: [],
+    categorias: [],
     categoria: '',
 
     editedIndex: -1,
@@ -279,7 +198,7 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'Nuevo artículo' : 'Editar artículo'
     },
   },
 
@@ -293,41 +212,32 @@ export default {
   },
 
   created () {
-    //this.list(); para enlazar con el backend al activar ese se borra el de abajo
-    //this.listCategorias(); para enlazar con el backend al activar ese se borra el de abajo
-    this.initialize()
+    this.list();
+    this.listCategorias();
   },
 
   methods: {
-    initialize () {
-      this.desserts = [
-        {
-          nombre: 'Frozen Yogurt',
-          descripcion: 159,
-          estado: 6.0,
-        },
-      ]
-    },
+
     //Metodo para hacer consulta ala base de datos 
-    // list(){
-    //   axios.get('http://localhost:3000/api/articulo/list')
-    //   .then( response =>{
-    //     this.articulos = response.data;
-    //     this.cargando = false;
-    //   })
-    //   .catch(error =>{
-    //     console.log(error);
-    //   })
-    // },
-        // listCategorias(){
-    //   axios.get('http://localhost:3000/api/categoria/list')
-    //   .then( response =>{
-    //     this.categorias = response.data;
-    //   })
-    //   .catch(error =>{
-    //     console.log(error);
-    //   })
-    // },
+    list(){
+      axios.get('http://localhost:3000/api/articulo/list')
+      .then( response =>{
+        this.articulos = response.data;
+        this.cargando = false;
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    },
+        listCategorias(){
+      axios.get('http://localhost:3000/api/categoria/list')
+      .then( response =>{
+        this.categorias = response.data;
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    },
 
     editItem (item) {
       this.editedIndex = item.id
@@ -342,9 +252,9 @@ export default {
       this.dialogDelete = true
     },
 
-    deleteItemConfirm () {
+    changeState () {
           
-      if (this.editedItem === 1) {
+      if (this.editedItem.estado === 1) {
         //put
         axios.put('http://localhost:3000/api/articulo/deactivate', {
           "id": this.editedItem.id,
@@ -391,37 +301,35 @@ export default {
     save () {
       if (this.editedIndex > -1) {
         //put
-        // axios.put('http://localhost:3000/api/articulo/update', {
-        //   "id": this.editedItem.id,
-        //   "nombre": this.editedItem.nombre,
-        //   "descripcion": this.editedItem.descripcion,
-        // "codigo": this.editedItem.codigo,
-        // "categoria": this.categoria.id,
-        // })
-        // .then( response =>{
-        //   this.list();
-        // })
-        // .catch(error => {
-        //   return error;
-        // })
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)//cuando se active lo de arriba este se borra
+        axios.put('http://localhost:3000/api/articulo/update', {
+          "id": this.editedItem.id,
+          "nombre": this.editedItem.nombre,
+          "descripcion": this.editedItem.descripcion,
+        "codigo": this.editedItem.codigo,
+        "categoria": this.categoria.id,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
       } else {
         //post
-        // axios.post('http://localhost:3000/api/articulo/add', {
-        //   "estado": 1,
-        //   "nombre": this.editedItem.nombre,
-        //   "descripcion": this.editedItem.descripcion,
-        //   "codigo": this.editedItem.codigo,
-        //   "categoriaId": this.categoria.id,
-        // })
-        // .then( response =>{
-        //   this.list();
-        // })
-        // .catch(error => {
-        //   return error;
-        // })
+        axios.post('http://localhost:3000/api/articulo/add', {
+          "estado": 1,
+          "nombre": this.editedItem.nombre,
+          "descripcion": this.editedItem.descripcion,
+          "codigo": this.editedItem.codigo,
+          "categoriaId": this.categoria.id,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
 
-        this.desserts.push(this.editedItem)//esta tambien se borra al activar lo de arriba
       }
       this.close()
     },
