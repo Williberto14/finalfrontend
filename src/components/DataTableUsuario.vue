@@ -78,7 +78,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                <v-btn color="blue darken-1" text @click="changeState">OK</v-btn>
                 <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
@@ -144,32 +144,7 @@ export default {
     desserts: [],
 
 // Creo este objeto que equivale a lo que me devolveria la peticion al backend para hacer pruebas
-    usuarios: [
-      {
-        "id": 1,
-        "nombre": "carlos",
-        "email": "carlos@pepe.com",
-        "estado": 1,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951"
-      },
-      {
-        "id": 2,
-        "nombre": "andres",
-        "email": "andres@pepe.com",
-        "estado": 1,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951"
-      },
-      {
-        "id": 3,
-        "nombre": "willi",
-        "email": "willi@pepe.com",
-        "estado": 0,
-        "createdAt": "30/01/1991",
-        "updateAt": "05/02/1951"
-      },
-    ],
+    usuarios: [],
     editedIndex: -1,
     editedItem: {
       id:0,
@@ -187,7 +162,7 @@ export default {
 
   computed: {
     formTitle () {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+      return this.editedIndex === -1 ? 'Nuevo usuario' : 'Editar usuario'
     },
   },
 
@@ -201,31 +176,22 @@ export default {
   },
 
   created () {
-    //this.list(); para enlazar con el backend al activar ese se borra el de abajo
-    this.initialize()
+    this.list();
   },
 
   methods: {
-    initialize () {
-      this.desserts = [
-        {
-          nombre: 'Frozen Yogurt',
-          descripcion: 159,
-          estado: 6.0,
-        },
-      ]
-    },
+    
     //Metodo para hacer consulta ala base de datos 
-    // list(){
-    //   axios.get('http://localhost:3000/api/usuario/list')
-    //   .then( response =>{
-    //     this.usuarios = response.data;
-    //     this.cargando = false;
-    //   })
-    //   .catch(error =>{
-    //     console.log(error);
-    //   })
-    // },
+    list(){
+      axios.get('http://localhost:3000/api/usuario/list')
+      .then( response =>{
+        this.usuarios = response.data;
+        this.cargando = false;
+      })
+      .catch(error =>{
+        console.log(error);
+      })
+    },
 
     editItem (item) {
       this.editedIndex = item.id
@@ -239,11 +205,11 @@ export default {
       this.dialogDelete = true
     },
 
-    deleteItemConfirm () {
+    changeState () {
           
       if (this.editedItem === 1) {
         //put
-        axios.put('http://localhost:3000/api/categoria/deactivate', {
+        axios.put('http://localhost:3000/api/usuario/deactivate', {
           "id": this.editedItem.id,
         })
         .then( response =>{
@@ -254,7 +220,7 @@ export default {
         })
       } else {
         //post
-        axios.put('http://localhost:3000/api/categoria/activate', {
+        axios.put('http://localhost:3000/api/usuario/activate', {
           "id": this.editedItem.id,
         })
         .then( response =>{
@@ -287,33 +253,31 @@ export default {
     save () {
       if (this.editedIndex > -1) {
         //put
-        // axios.put('http://localhost:3000/api/categoria/update', {
-        //   "id": this.editedItem.id,
-        //   "nombre": this.editedItem.nombre,
-        //   "descripcion": this.editedItem.descripcion,
-        // })
-        // .then( response =>{
-        //   this.list();
-        // })
-        // .catch(error => {
-        //   return error;
-        // })
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)//cuando se active lo de arriba este se borra
+        axios.put('http://localhost:3000/api/usuario/update', {
+          "id": this.editedItem.id,
+          "nombre": this.editedItem.nombre,
+          "descripcion": this.editedItem.descripcion,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
       } else {
         //post
-        // axios.post('http://localhost:3000/api/categoria/add', {
-        //   "estado": 1,
-        //   "nombre": this.editedItem.nombre,
-        //   "descripcion": this.editedItem.descripcion,
-        // })
-        // .then( response =>{
-        //   this.list();
-        // })
-        // .catch(error => {
-        //   return error;
-        // })
+        axios.post('http://localhost:3000/api/usuario/add', {
+          "estado": 1,
+          "nombre": this.editedItem.nombre,
+          "descripcion": this.editedItem.descripcion,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
 
-        this.desserts.push(this.editedItem)//esta tambien se borra al activar lo de arriba
       }
       this.close()
     },
