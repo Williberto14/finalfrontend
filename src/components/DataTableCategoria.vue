@@ -5,7 +5,10 @@
     :headers="headers" 
     :items="categorias" 
     sort-by="nombre" 
-    class="elevation-1">
+    class="elevation-1"
+    :loading="cargando"
+    loading-text="Cargando... Espere por favor"
+    >
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Categorias</v-toolbar-title>
@@ -25,21 +28,24 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
+
+                    <v-col cols="12">
+                      <v-text-field 
+                      v-model="editedItem.nombre" 
+                      label="Nombre"
+                      ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
+
+                    <v-col cols="12">
+                      <v-textarea 
+                      v-model="editedItem.descripcion" 
+                      label="Descripción"
+                      auto-grow
+                      no-resize
+                      counter="250"
+                      ></v-textarea>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
-                    </v-col>
+                    
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -68,14 +74,31 @@
           </v-dialog>
         </v-toolbar>
       </template>
+
       <template v-slot:item.actions="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-pencil
+
+        <v-icon 
+        small class="mr-2"
+        @click="editItem(item)"
+        >
+        mdi-pencil
         </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete
+
+        <v-icon 
+        medium 
+        @click="deleteItem(item)"
+        >
+        <!-- Programa boton switch para que encienda y apague al cambiar el estado  -->
+        <template v-if="item.estado">
+        mdi-toggle-switch
+        </template>
+        <template v-else>
+        mdi-toggle-switch-off-outline
+        </template>
         </v-icon>
+
       </template>
+
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">
           Reset
@@ -94,7 +117,9 @@ export default {
     data: () => ({
     dialog: false,
     dialogDelete: false,
+    cargando: false, //al conectar a la base de datos este quedara true
     headers: [
+      { text: 'ID', value: 'id' },
       {
         text: 'Categoria',
         align: 'start',
@@ -124,20 +149,29 @@ export default {
         "estado": 1,
         "createdAt": "31/01/1991",
         "updateAt": "06/02/1951"
+      },
+      {
+        "id": 3,
+        "nombre": "categoria 3",
+        "descripcion": "soy una categoria 3",
+        "estado": 0,
+        "createdAt": "31/02/1991",
+        "updateAt": "06/03/1951"
       }
     ],
 
     editedIndex: -1,
     editedItem: {
+      id:0,
       nombre: '',
-      descripcion: 0,
+      descripcion: '',
       estado: 0,
     },
     defaultItem: {
+      id:0,
       nombre: '',
-      descripcion: 0,
+      descripcion: '',
       estado: 0,
-      
     },
   }),
 
@@ -157,6 +191,7 @@ export default {
   },
 
   created () {
+    //this.list(); para enlazar con el backend al activar ese se borra el de abajo
     this.initialize()
   },
 
@@ -170,9 +205,20 @@ export default {
         },
       ]
     },
+    //Metodo para hacer consulta ala base de datos 
+    // list(){
+    //   axios.get('http://localhost:3000/api/categoria/list')
+    //   .then( response =>{
+    //     this.categorias = response.data;
+    //     this.cargando = false;
+    //   })
+    //   .catch(error =>{
+    //     console.log(error);
+    //   })
+    // },
 
     editItem (item) {
-      this.editedIndex = this.desserts.indexOf(item)
+      this.editedIndex = item.id
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
@@ -184,7 +230,31 @@ export default {
     },
 
     deleteItemConfirm () {
-      this.desserts.splice(this.editedIndex, 1)
+          
+      if (this.editedItem === 1) {
+        //put
+        axios.put('http://localhost:3000/api/categoria/deactivate', {
+          "id": this.editedItem.id,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
+      } else {
+        //post
+        axios.put('http://localhost:3000/api/categoria/activate', {
+          "id": this.editedItem.id,
+        })
+        .then( response =>{
+          this.list();
+        })
+        .catch(error => {
+          return error;
+        })
+      }
+
       this.closeDelete()
     },
 
@@ -206,9 +276,34 @@ export default {
 
     save () {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        //put
+        // axios.put('http://localhost:3000/api/categoria/update', {
+        //   "id": this.editedItem.id,
+        //   "nombre": this.editedItem.nombre,
+        //   "descripcion": this.editedItem.descripcion,
+        // })
+        // .then( response =>{
+        //   this.list();
+        // })
+        // .catch(error => {
+        //   return error;
+        // })
+        Object.assign(this.desserts[this.editedIndex], this.editedItem)//cuando se active lo de arriba este se borra
       } else {
-        this.desserts.push(this.editedItem)
+        //post
+        // axios.post('http://localhost:3000/api/categoria/add', {
+        //   "estado": 1,
+        //   "nombre": this.editedItem.nombre,
+        //   "descripcion": this.editedItem.descripcion,
+        // })
+        // .then( response =>{
+        //   this.list();
+        // })
+        // .catch(error => {
+        //   return error;
+        // })
+
+        this.desserts.push(this.editedItem)//esta tambien se borra al activar lo de arriba
       }
       this.close()
     },
