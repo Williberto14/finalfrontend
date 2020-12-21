@@ -51,6 +51,7 @@
 // importo sweetalert
 import swal from "sweetalert";
 import VueJwtDecode from 'vue-jwt-decode'
+import axios from 'axios';
 
 export default {
   data() {
@@ -62,24 +63,21 @@ export default {
     };
   },
   methods: {
-    async loginUser() {
-      try {
-        //console.log(this.login);
-        let response = await this.$http.post("/api/usuario/login", this.login);
-        console.log(response.data);
-        let token = response.data.tokenReturn;
-        let user = response.data.user;
-
-        localStorage.setItem("jwt", token);
-        localStorage.setItem("user", JSON.stringify(user));
-
-        if (token) {
-          swal("Bienvenido!", "Login correcto", "success");
-          this.$router.push("/home");
-        }
-      } catch (error) {
-        swal("Oops!", "Algo salió mal", "error");
-      }
+    loginUser() {
+      axios.post('http://localhost:3000/api/usuario/login', this.login)
+        .then( response => {
+          return response.data;
+        })
+        .then(data => {
+            this.$router.push("/segura");
+            swal("Bienvenido!", "Login correcto", "success");
+            console.log(data);
+        })
+        .catch(error => {
+          swal("Oops!", "Algo salió mal", "error");
+          console.log(error);
+          return error;
+        })
     },
   },
 };
