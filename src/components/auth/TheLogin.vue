@@ -38,7 +38,7 @@
               Iniciar Sesión
             </button>
             <div class="mt-2 text-center">
-              <a href="#"> Olvidaste tu contraseña? </a>
+              <a href="http://localhost:8080"> Volver al inicio </a>
             </div>
           </form>
         </section>
