@@ -56,6 +56,20 @@
                       label="Estado"
                       ></v-text-field>
                     </v-col>
+
+                     <v-select 
+                      v-model="editedItem.rol" 
+                      label="Rol"
+                      :items="roles"
+                      return-object
+                      ></v-select>
+
+                    <v-col cols="12">
+                      <v-text-field 
+                      v-model="editedItem.password" 
+                      label="Contraseña"
+                      ></v-text-field>
+                    </v-col>
                     
                   </v-row>
                 </v-container>
@@ -138,24 +152,29 @@ export default {
         value: 'nombre',//Aqui puede haber un error revisar como se llama ento en la base de datos
       },
       { text: 'Correo', value: 'email' },
+      { text: 'Rol', value: 'rol' },
       { text: 'Estado', value: 'estado' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
     desserts: [],
+    roles: ["Administrador", "Vendedor", "Almacenero"],
 
-// Creo este objeto que equivale a lo que me devolveria la peticion al backend para hacer pruebas
     usuarios: [],
     editedIndex: -1,
     editedItem: {
       id:0,
       nombre: '',
+      rol: '',
       email: '',
+      password:'',
       estado: 0,
     },
     defaultItem: {
       id:0,
       nombre: '',
+      rol: '',
       email: '',
+      password:'',
       estado: 0,
     },
   }),
@@ -254,9 +273,10 @@ export default {
       if (this.editedIndex > -1) {
         //put
         axios.put('http://localhost:3000/api/usuario/update', {
-          "id": this.editedItem.id,
+         "rol": this.editedItem.rol,
           "nombre": this.editedItem.nombre,
-          "descripcion": this.editedItem.descripcion,
+          "password": this.editedItem.password,
+          "email": this.editedItem.email,
         })
         .then( response =>{
           this.list();
@@ -266,10 +286,11 @@ export default {
         })
       } else {
         //post
-        axios.post('http://localhost:3000/api/usuario/add', {
-          "estado": 1,
+        axios.post('http://localhost:3000/api/categoria/add', {
+          "rol": this.editedItem.rol,
           "nombre": this.editedItem.nombre,
-          "descripcion": this.editedItem.descripcion,
+          "password": this.editedItem.password,
+          "email": this.editedItem.email
         })
         .then( response =>{
           this.list();

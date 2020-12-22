@@ -5,6 +5,17 @@
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title>Group 37</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <v-btn
+      icon
+      class="mr-5"
+      @click = "salir()">
+        <v-icon>mdi-logout</v-icon>
+        <span>salir</span>
+      </v-btn>
+
     </v-app-bar>
 
     <!-- Menú desplegable del lato izquierdo -->
@@ -94,5 +105,14 @@ export default {
     ],
     //Aqui terminan los Scripts de las listas desplegables
   }),
+  created(){
+    this.$store.dispatch('autoLogin');
+  },
+
+  methods:{
+    salir(){
+      this.$store.dispatch('salir');
+    }
+  }
 };
 </script>
